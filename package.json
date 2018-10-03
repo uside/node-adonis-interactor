@@ -1,0 +1,21 @@
+{
+  "name": "@uside/adonis-interactor",
+  "version": "1.0.0",
+  "description": "Simple business logic container for Adonis",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Vladimir <uSide> Kleshko",
+    "email": "uside.node@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/uSide/node-adonis-interactor",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:uSide/node-adonis-interactor.git"
+  },
+  "devDependencies": {
+    "japa": "^2.0.3"
+  }
+}
