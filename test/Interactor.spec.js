@@ -19,10 +19,10 @@ test("works", async assert => {
   assert.equal(result.value.passed, true);
 });
 
-test("validates", async assert => {
+test("validates simple types", async assert => {
   class Test extends Interactor {
     get rules() {
-      return { arg: "string" };
+      return { arg: "String" };
     }
 
     async perform({ arg }) {
@@ -38,6 +38,36 @@ test("validates", async assert => {
   assert.equal(valid.success, true);
   assert.equal(valid.error, null);
   assert.equal(valid.value, "test");
+});
+
+test("validates extended types", async assert => {
+  class Test extends Interactor {
+    get rules() {
+      return { arg: this.schema.oneOf("String", "Number") };
+    }
+
+    async perform({ arg }) {
+      return arg;
+    }
+  }
+
+  let empty = await Test.perform();
+  assert.equal(empty.success, false);
+  assert.equal(empty.error, "INVALID_ARGUMENTS");
+
+  let invalid = await Test.perform({ arg: true });
+  assert.equal(invalid.success, false);
+  assert.equal(invalid.error, "INVALID_ARGUMENTS");
+
+  let valid_str = await Test.perform({ arg: "test" });
+  assert.equal(valid_str.success, true);
+  assert.equal(valid_str.error, null);
+  assert.equal(valid_str.value, "test");
+
+  let valid_number = await Test.perform({ arg: 5 });
+  assert.equal(valid_number.success, true);
+  assert.equal(valid_number.error, null);
+  assert.equal(valid_number.value, 5);
 });
 
 test("fails correctly", async assert => {

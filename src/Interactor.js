@@ -1,6 +1,6 @@
 "use strict";
 
-const Sanitizer = require("./Sanitizer");
+const typeforce = require("typeforce");
 const { InteractorError, Failure, Success } = require("./Results");
 
 module.exports = Logger => {
@@ -8,18 +8,23 @@ module.exports = Logger => {
     static async perform(args) {
       let start = Date.now();
       let instance = new this();
+      let rules = instance.rules;
 
-      if (instance.rules) {
+      if (rules) {
+        if (!this._schema) {
+          this._schema = typeforce.compile(rules);
+        }
+
         try {
-          args = Sanitizer.prepare(args || {}, instance.rules);
+          this._schema(args || {}, true);
         } catch (e) {
-          instance.error("INVALID_ARGUMENTS (%j)", args);
+          instance.error("INVALID_ARGUMENTS (%s)", e.message);
           return new Failure("INVALID_ARGUMENTS");
         }
       }
 
-      instance.info(`called ${args ? "with " + JSON.stringify(args) : ""}`);
       let result;
+      instance.info(`called ${args ? "with " + JSON.stringify(args) : ""}`);
       try {
         result = new Success(await instance.perform(args));
       } catch (e) {
@@ -32,6 +37,10 @@ module.exports = Logger => {
       }
       instance.info(`finished ${Date.now() - start} ms`);
       return result;
+    }
+
+    get schema() {
+      return typeforce;
     }
 
     fail(code) {
