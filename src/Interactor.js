@@ -5,9 +5,30 @@ const { InteractorError, Failure, Success } = require("./Results");
 
 module.exports = Logger => {
   return class Interactor {
-    static async perform(args) {
-      let start = Date.now();
+    static perform(args) {
       let instance = new this();
+      instance._unwrapped = false;
+
+      let exec = new Promise((resolve, reject) => {
+        this.invoke(instance, args).then(result => {
+          if (instance._unwrapped) {
+            resolve(result.value);
+          } else {
+            resolve(result);
+          }
+        }, reject);
+      });
+
+      exec.unwrap = () => {
+        instance._unwrapped = true;
+        return exec;
+      };
+
+      return exec;
+    }
+
+    static async invoke(instance, args) {
+      let start = Date.now();
       let rules = instance.rules;
 
       if (rules) {
@@ -24,11 +45,11 @@ module.exports = Logger => {
       }
 
       let result;
-      instance.info(`called ${args ? "with " + JSON.stringify(args) : ""}`);
+      instance.info("called");
       try {
         result = new Success(await instance.perform(args));
       } catch (e) {
-        if (e instanceof InteractorError) {
+        if (e instanceof InteractorError && !instance._unwrapped) {
           instance.error(e.code);
           result = new Failure(e.code);
         } else {
