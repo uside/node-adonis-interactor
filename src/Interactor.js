@@ -46,6 +46,11 @@ module.exports = Logger => {
 
       let result;
       instance.info("called");
+
+      if (instance.before) {
+        instance.before();
+      }
+
       try {
         result = new Success(await instance.perform(args));
       } catch (e) {
@@ -56,6 +61,11 @@ module.exports = Logger => {
           throw e;
         }
       }
+
+      if (instance.after) {
+        instance.after();
+      }
+
       instance.info(`finished ${Date.now() - start} ms`);
       return result;
     }

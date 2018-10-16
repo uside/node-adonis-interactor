@@ -139,3 +139,30 @@ test.group("With nesting", () => {
     assert.equal(result.value, "test");
   });
 });
+
+test.group("Hooks", () => {
+  test("called even if #perform fails", async assert => {
+    let before_called = false;
+    let after_called = false;
+
+    class Test extends Interactor {
+      async before() {
+        before_called = true;
+      }
+
+      async after() {
+        after_called = true;
+      }
+
+      async perform() {
+        this.fail("MY_ERROR");
+      }
+    }
+
+    let result = await Test.perform();
+    assert.equal(result.success, false);
+    assert.equal(result.error, "MY_ERROR");
+    assert.equal(before_called, true);
+    assert.equal(after_called, true);
+  });
+});
