@@ -31,19 +31,6 @@ module.exports = Logger => {
       let start = Date.now();
       let rules = instance.rules;
 
-      if (rules) {
-        if (!this._schema) {
-          this._schema = typeforce.compile(rules);
-        }
-
-        try {
-          this._schema(args || {}, true);
-        } catch (e) {
-          instance.error("INVALID_ARGUMENTS (%s)", e.message);
-          return new Failure("INVALID_ARGUMENTS");
-        }
-      }
-
       let result;
       instance.info("called");
 
@@ -52,6 +39,19 @@ module.exports = Logger => {
       }
 
       try {
+        if (rules) {
+          if (!this._schema) {
+            this._schema = typeforce.compile(rules);
+          }
+
+          try {
+            this._schema(args || {}, true);
+          } catch (e) {
+            instance.error("INVALID_ARGUMENTS (%s)", e.message);
+            instance.fail("INVALID_ARGUMENTS");
+          }
+        }
+
         result = new Success(await instance.perform(args));
       } catch (e) {
         if (e instanceof InteractorError && !instance._unwrapped) {
