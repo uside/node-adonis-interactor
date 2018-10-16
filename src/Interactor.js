@@ -48,7 +48,7 @@ module.exports = Logger => {
       instance.info("called");
 
       if (instance.before) {
-        instance.before();
+        await instance.before();
       }
 
       try {
@@ -63,7 +63,7 @@ module.exports = Logger => {
       }
 
       if (instance.after) {
-        instance.after();
+        await instance.after();
       }
 
       instance.info(`finished ${Date.now() - start} ms`);
