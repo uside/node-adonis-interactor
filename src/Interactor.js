@@ -39,18 +39,20 @@ module.exports = Logger => {
       }
 
       try {
-        if (rules) {
-          if (!this._schema) {
-            this._schema = typeforce.compile(rules);
-          }
+        await (async () => {
+          if (rules) {
+            if (!this._schema) {
+              this._schema = typeforce.compile(rules);
+            }
 
-          try {
-            this._schema(args || {}, true);
-          } catch (e) {
-            instance.error("INVALID_ARGUMENTS (%s)", e.message);
-            instance.fail("INVALID_ARGUMENTS");
+            try {
+              this._schema(args || {}, true);
+            } catch (e) {
+              instance.error("INVALID_ARGUMENTS (%s)", e.message);
+              instance.fail("INVALID_ARGUMENTS");
+            }
           }
-        }
+        })();
 
         result = new Success(await instance.perform(args));
       } catch (e) {
