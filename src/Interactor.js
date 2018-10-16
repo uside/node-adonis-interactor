@@ -60,10 +60,10 @@ module.exports = Logger => {
         } else {
           throw e;
         }
-      }
-
-      if (instance.after) {
-        await instance.after();
+      } finally {
+        if (instance.after) {
+          await instance.after();
+        }
       }
 
       instance.info(`finished ${Date.now() - start} ms`);
