@@ -88,8 +88,8 @@ module.exports = Logger => {
       Logger.info(`[${this.constructor.name}] ${msg}`, ...args);
     }
 
-    warn(msg, ...args) {
-      Logger.warn(`[${this.constructor.name}] ${msg}`, ...args);
+    warning(msg, ...args) {
+      Logger.warning(`[${this.constructor.name}] ${msg}`, ...args);
     }
   };
 };

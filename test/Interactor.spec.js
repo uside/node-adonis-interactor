@@ -1,7 +1,7 @@
 const test = require("japa");
 const Interactor = require("../src/Interactor")({
   info: () => {},
-  warn: () => {},
+  warning: () => {},
   error: () => {}
 });
 
